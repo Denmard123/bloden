@@ -47,7 +47,6 @@
         return;
       }
   
-      // Isi otomatis GH config dari localStorage
       GH.owner = localStorage.getItem("GH_OWNER") || GH.owner;
       GH.repo = localStorage.getItem("GH_REPO") || GH.repo;
       GH.token = localStorage.getItem("GH_TOKEN") || GH.token;
@@ -65,31 +64,45 @@
           return;
         }
   
-        posts.forEach(p => {
+        posts.forEach((p, index) => {
           const div = document.createElement("div");
           div.className = "p-4 mb-2 bg-white rounded shadow";
           div.innerHTML = `
             <h2 class="font-bold">${escapeHtml(p.title)}</h2>
             <p class="text-sm text-gray-600">${escapeHtml(p.date)}</p>
             <a class="text-blue-700" href="posts/${p.slug}.html" target="_blank">Lihat Artikel</a>
+            <div class="mt-2 space-x-2">
+              <button class="edit-btn bg-yellow-500 text-white px-2 py-1 rounded" data-index="${index}">Edit</button>
+              <button class="delete-btn bg-red-600 text-white px-2 py-1 rounded" data-index="${index}">Delete</button>
+            </div>
           `;
           box.appendChild(div);
+        });
+  
+        // Tambahkan event listener untuk Edit & Delete
+        document.querySelectorAll(".edit-btn").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const idx = parseInt(btn.dataset.index);
+            editPost(idx);
+          });
+        });
+  
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const idx = parseInt(btn.dataset.index);
+            deletePost(idx);
+          });
         });
       }
   
       // -----------------------------
-      // Submit new article
+      // Create / Update Article
       // -----------------------------
       document.getElementById("formNewPost")?.addEventListener("submit", async e => {
         e.preventDefault();
-  
         const title = document.getElementById("title").value.trim();
         const content = document.getElementById("content").value.trim();
-  
-        if (!title || !content) {
-          alert("Judul & konten wajib diisi!");
-          return;
-        }
+        if (!title || !content) return alert("Judul & konten wajib diisi!");
   
         const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
         const html = `
@@ -110,15 +123,59 @@
         try {
           await GH.saveFile(`posts/${slug}.html`, html);
           await GH.updatePostsJSON({ title, slug, date: new Date().toISOString() });
-          await GH.updateSitemap();
-  
           alert("Artikel berhasil dipublish!");
+          document.getElementById("formNewPost").reset();
           loadPosts();
         } catch (err) {
           console.error("Error publish:", err);
           alert("Gagal publish artikel. Cek console untuk detail.");
         }
       });
+  
+      // -----------------------------
+      // Edit Article
+      // -----------------------------
+      async function editPost(index) {
+        const posts = await GH.listPostsIndex();
+        const post = posts[index];
+        if (!post) return alert("Artikel tidak ditemukan");
+  
+        document.getElementById("title").value = post.title;
+        // Ambil content asli dari GitHub
+        try {
+          const res = await fetch(`https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/main/posts/${post.slug}.html`);
+          const text = await res.text();
+          // Ambil bagian body saja
+          const contentMatch = text.match(/<div class="container">([\s\S]*?)<\/div>/);
+          document.getElementById("content").value = contentMatch ? contentMatch[1] : "";
+          document.querySelector(".nav-btn[data-target='newpost']").click();
+  
+          // Delete lama dulu sebelum publish baru
+          deletePost(index, false);
+        } catch (err) {
+          console.error("Gagal load artikel:", err);
+        }
+      }
+  
+      // -----------------------------
+      // Delete Article
+      // -----------------------------
+      async function deletePost(index, reload = true) {
+        const posts = await GH.listPostsIndex();
+        const post = posts[index];
+        if (!post) return alert("Artikel tidak ditemukan");
+  
+        if (!confirm(`Hapus artikel "${post.title}"?`)) return;
+  
+        // Hapus file HTML dari GitHub
+        await GH.saveFile(`posts/${post.slug}.html`, ""); // overwrite dengan kosong atau bisa pakai API delete
+        // Update posts.json
+        posts.splice(index, 1);
+        await GH.saveFile("data/posts.json", JSON.stringify(posts, null, 2));
+        await GH.updateSitemap(posts);
+  
+        if (reload) loadPosts();
+      }
   
       if (document.getElementById("postList")) loadPosts();
   

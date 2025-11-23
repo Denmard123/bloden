@@ -1,5 +1,5 @@
 // =============================
-// GitHub API Handler (CMS-Friendly)
+// GitHub API Handler (CMS-Friendly & Optimized)
 // =============================
 const GH = {
     owner: "",   // akan diisi dari localStorage
@@ -7,7 +7,7 @@ const GH = {
     token: "",   // akan diisi dari localStorage
 
     // ----------------------------
-    // SAVE FILE TO GITHUB
+    // SAVE FILE KE GITHUB
     // ----------------------------
     async saveFile(path, content) {
         console.log("SAVE FILE:", path);
@@ -18,18 +18,18 @@ const GH = {
         }
 
         const url = `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${path}`;
+        let sha;
 
-        // GET SHA file lama (jika ada)
-        let sha = undefined;
+        // Cek apakah file sudah ada
         try {
-            const exist = await fetch(url, {
+            const res = await fetch(url, {
                 headers: {
                     "Authorization": `Bearer ${this.token}`,
                     "Accept": "application/vnd.github+json"
                 }
             });
-            if (exist.ok) {
-                const json = await exist.json();
+            if (res.ok) {
+                const json = await res.json();
                 sha = json.sha;
             }
         } catch (err) {
@@ -52,10 +52,9 @@ const GH = {
                 },
                 body: JSON.stringify(body)
             });
-
             if (!res.ok) {
-                const errText = await res.text();
-                console.error("Gagal upload file:", errText);
+                const text = await res.text();
+                console.error("Gagal upload file:", text);
             } else {
                 console.log("File berhasil diupload:", path);
             }
@@ -65,7 +64,7 @@ const GH = {
     },
 
     // ----------------------------
-    // GET posts.json
+    // LIST POSTS
     // ----------------------------
     async listPostsIndex() {
         try {
@@ -84,33 +83,37 @@ const GH = {
         const posts = await this.listPostsIndex();
         posts.push(newPost);
 
-        const json = JSON.stringify(posts, null, 2);
-        await this.saveFile("data/posts.json", json);
+        // Simpan posts.json baru
+        await this.saveFile("data/posts.json", JSON.stringify(posts, null, 2));
+
+        // Update sitemap secara otomatis
+        await this.updateSitemap(posts);
     },
 
     // ----------------------------
     // UPDATE SITEMAP.XML
     // ----------------------------
-    async updateSitemap() {
-        const posts = await this.listPostsIndex();
+    async updateSitemap(posts = null) {
+        // Jika posts belum di-pass, fetch dulu
+        if (!posts) posts = await this.listPostsIndex();
 
+        // Generate XML valid
         const urls = posts.map(p => `
     <url>
         <loc>https://${this.owner}.github.io/${this.repo}/posts/${p.slug}.html</loc>
         <lastmod>${p.date}</lastmod>
     </url>`).join("");
 
-        const xml =
-            `<?xml version="1.0" encoding="UTF-8"?>` +
-            `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` +
-            urls +
-            `</urlset>`;
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
 
         await this.saveFile("sitemap.xml", xml);
     },
 
     // ----------------------------
-    // INIT CONFIG dari localStorage
+    // INIT CONFIG DARI LOCALSTORAGE
     // ----------------------------
     initFromStorage() {
         this.owner = localStorage.getItem("GH_OWNER") || "";
