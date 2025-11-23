@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Index</title>
+
+  <!-- GH API WAJIB -->
+  <script src="assets/api.js"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const container = document.getElementById("articles");
+      container.innerHTML = "Loading...";
+
+      try {
+        const posts = await window.GH.listPostsIndex();
+        container.innerHTML = "";
+
+        if (!posts || posts.length === 0) {
+          container.innerHTML = `<p class='text-gray-500'>Belum ada artikel</p>`;
+          return;
+        }
+
+        posts.forEach(p => {
+          const el = document.createElement("div");
+          el.className = "p-4 mb-4 bg-white shadow rounded";
+          el.innerHTML = `
+            <h2 class='text-xl font-bold'>${p.title}</h2>
+            <p class='text-sm text-gray-600 mb-2'>${p.date}</p>
+            <a class='text-blue-600 underline' href='posts/${p.slug}.html'>Baca selengkapnya</a>
+          `;
+          container.appendChild(el);
+        });
+      } catch (err) {
+        container.innerHTML = `<p class='text-red-500'>Error loading posts</p>`;
+        console.error(err);
+      }
+    });
+  </script>
+
+</head>
+<body class="bg-gray-100">
+
+  <div class="max-w-3xl mx-auto py-10">
+    <h1 class="text-3xl font-bold mb-6">Artikel Terbaru</h1>
+    <div id="articles"></div>
+  </div>
+
+</body>
+</html>

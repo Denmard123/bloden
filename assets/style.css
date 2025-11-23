@@ -1,0 +1,225 @@
+/* =========================
+   GLOBAL RESET
+========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: "Inter", Arial, sans-serif;
+    background: #f7f8fa;
+    color: #1f2d3d;
+    line-height: 1.7;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* =========================
+     WRAPPER LAYOUT
+  ========================= */
+  .container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  /* =========================
+     HEADER
+  ========================= */
+  header {
+    background: #ffffff;
+    padding: 25px 20px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  
+  header h1 {
+    font-size: 28px;
+    color: #111827;
+    font-weight: 700;
+  }
+  
+  header p {
+    color: #4b5563;
+    margin-top: 5px;
+    font-size: 15px;
+  }
+  
+  /* =========================
+     POSTS LIST
+  ========================= */
+  .post-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 18px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.16s ease;
+  }
+  
+  .post-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  }
+  
+  .post-card h2 {
+    margin-bottom: 8px;
+    color: #111827;
+    font-size: 22px;
+  }
+  
+  .post-card a {
+    text-decoration: none;
+    color: #2563eb;
+    transition: 0.2s;
+  }
+  
+  .post-card a:hover {
+    color: #1e40af;
+  }
+  
+  .post-meta {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 10px;
+  }
+  
+  /* =========================
+     ARTICLE PAGE
+  ========================= */
+  article h1 {
+    font-size: 30px;
+    color: #0f172a;
+    margin-bottom: 14px;
+  }
+  
+  article {
+    background: white;
+    padding: 28px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  
+  article p {
+    margin: 14px 0;
+  }
+  
+  article img {
+    width: 100%;
+    border-radius: 10px;
+    margin: 20px 0;
+  }
+  
+  article h2 {
+    font-size: 22px;
+    margin-top: 25px;
+    margin-bottom: 12px;
+    color: #111827;
+  }
+  
+  article h3 {
+    font-size: 19px;
+    margin-top: 18px;
+    margin-bottom: 10px;
+  }
+  
+  /* =========================
+     SIDEBAR (CMS)
+  ========================= */
+  .sidebar {
+    width: 230px;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    padding: 25px 20px;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+  }
+  
+  .sidebar h3 {
+    font-size: 17px;
+    margin-bottom: 20px;
+    color: #111827;
+    font-weight: 600;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+  }
+  
+  .sidebar ul li {
+    margin-bottom: 14px;
+  }
+  
+  .sidebar ul li a {
+    text-decoration: none;
+    color: #374151;
+    font-size: 15px;
+    font-weight: 500;
+    transition: 0.2s;
+  }
+  
+  .sidebar ul li a:hover {
+    color: #1e40af;
+  }
+  
+  /* =========================
+     CMS CONTENT
+  ========================= */
+  .cms-container {
+    margin-left: 250px;
+    padding: 30px;
+  }
+  
+  .input-group {
+    margin-bottom: 20px;
+  }
+  
+  input, textarea {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 15px;
+    outline: none;
+    resize: vertical;
+  }
+  
+  input:focus, textarea:focus {
+    border-color: #2563eb;
+  }
+  
+  /* =========================
+     BUTTONS
+  ========================= */
+  button {
+    padding: 12px 20px;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.2s;
+  }
+  
+  button:hover {
+    background: #1e40af;
+  }
+  
+  /* =========================
+     FOOTER
+  ========================= */
+  footer {
+    text-align: center;
+    padding: 25px;
+    color: #6b7280;
+    font-size: 14px;
+    margin-top: 50px;
+  }
+  

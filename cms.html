@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CMS</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="assets/style.css" />
+
+<!-- LOAD GH API FIRST -->
+<script src="assets/api.js"></script>
+
+<!-- THEN CMS LOGIC -->
+<script src="assets/cms.js" defer></script>
+
+</head>
+
+<body class="bg-gray-100 flex">
+
+<aside class="w-64 bg-white h-screen shadow-md p-4 space-y-4">
+  <button class="nav-btn w-full text-left p-2 hover:bg-gray-100" data-target="dashboard">Dashboard</button>
+  <button class="nav-btn w-full text-left p-2 hover:bg-gray-100" data-target="newpost">Tambah Artikel</button>
+  <button class="nav-btn w-full text-left p-2 hover:bg-gray-100" data-target="posts">Postingan</button>
+  <button class="nav-btn w-full text-left p-2 hover:bg-gray-100" data-target="setting">Setting</button>
+</aside>
+
+<main class="flex-1 p-6">
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="page">
+    <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
+    <p>Selamat datang di CMS.</p>
+  </section>
+
+  <!-- NEW POST -->
+  <section id="newpost" class="page hidden">
+    <h1 class="text-2xl font-bold mb-4">Buat Artikel Baru</h1>
+    <form id="formNewPost" class="space-y-4">
+      <input id="title" class="border p-2 w-full" placeholder="Judul Artikel" required>
+      <textarea id="content" class="border p-2 w-full h-40" placeholder="Isi Artikel..." required></textarea>
+      <button class="bg-blue-600 text-white px-4 py-2 rounded">Publish</button>
+    </form>
+  </section>
+
+  <!-- POSTS LIST -->
+  <section id="posts" class="page hidden">
+    <h1 class="text-2xl font-bold mb-4">Daftar Artikel</h1>
+    <div id="postList"></div>
+  </section>
+
+  <!-- SETTING -->
+  <section id="setting" class="page hidden">
+    <h1 class="text-xl font-bold mb-4">Setting</h1>
+    <p>Tambahkan repo/token di sini jika menggunakan auto-commit.</p>
+  </section>
+
+</main>
+
+</body>
+</html>
