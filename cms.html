@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <title>CMS</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="assets/style.css" />
+<link rel="stylesheet" href="assets/style.css">
 
 <!-- LOAD GH API FIRST -->
 <script src="assets/api.js"></script>
@@ -29,7 +29,7 @@
   <!-- DASHBOARD -->
   <section id="dashboard" class="page">
     <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
-    <p>Selamat datang di CMS.</p>
+    <p>Selamat datang di CMS. Gunakan menu di sebelah kiri untuk mengelola artikel.</p>
   </section>
 
   <!-- NEW POST -->
@@ -38,7 +38,7 @@
     <form id="formNewPost" class="space-y-4">
       <input id="title" class="border p-2 w-full" placeholder="Judul Artikel" required>
       <textarea id="content" class="border p-2 w-full h-40" placeholder="Isi Artikel..." required></textarea>
-      <button class="bg-blue-600 text-white px-4 py-2 rounded">Publish</button>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Publish</button>
     </form>
   </section>
 
@@ -50,8 +50,15 @@
 
   <!-- SETTING -->
   <section id="setting" class="page hidden">
-    <h1 class="text-xl font-bold mb-4">Setting</h1>
-    <p>Tambahkan repo/token di sini jika menggunakan auto-commit.</p>
+    <h1 class="text-xl font-bold mb-4">Setting GitHub</h1>
+    
+    <div class="space-y-4">
+      <input id="ghOwner" class="border p-2 w-full" placeholder="GitHub Owner" value="">
+      <input id="ghRepo" class="border p-2 w-full" placeholder="Repository Name" value="">
+      <input id="ghToken" type="password" class="border p-2 w-full" placeholder="GitHub Token (Private)">
+      <button id="saveSetting" class="bg-green-600 text-white px-4 py-2 rounded">Simpan</button>
+      <p class="text-sm text-gray-500 mt-2">Token hanya disimpan di browser (localStorage), tidak dikirim ke server.</p>
+    </div>
   </section>
 
 </main>
