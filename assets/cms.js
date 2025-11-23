@@ -1,9 +1,7 @@
 (function () {
     document.addEventListener("DOMContentLoaded", () => {
   
-      // -----------------------------
       // Sidebar navigation
-      // -----------------------------
       document.querySelectorAll(".nav-btn").forEach(btn => {
         btn.addEventListener("click", () => {
           const target = btn.dataset.target;
@@ -12,9 +10,7 @@
         });
       });
   
-      // -----------------------------
-      // Load GitHub Settings dari localStorage
-      // -----------------------------
+      // Load GitHub Settings
       const ownerInput = document.getElementById("ghOwner");
       const repoInput = document.getElementById("ghRepo");
       const tokenInput = document.getElementById("ghToken");
@@ -29,7 +25,6 @@
         localStorage.setItem("GH_REPO", repoInput.value.trim());
         localStorage.setItem("GH_TOKEN", tokenInput.value.trim());
   
-        // Update GH global config
         if (window.GH) {
           GH.owner = ownerInput.value.trim();
           GH.repo = repoInput.value.trim();
@@ -39,9 +34,6 @@
         alert("Setting GitHub berhasil disimpan!");
       });
   
-      // -----------------------------
-      // Cek GH Object
-      // -----------------------------
       if (!window.GH) {
         console.warn("GH undefined — offline mode");
         return;
@@ -53,7 +45,6 @@
   
       // -----------------------------
       // Load posts
-      // -----------------------------
       async function loadPosts() {
         const posts = await GH.listPostsIndex();
         const box = document.getElementById("postList");
@@ -79,25 +70,17 @@
           box.appendChild(div);
         });
   
-        // Tambahkan event listener untuk Edit & Delete
         document.querySelectorAll(".edit-btn").forEach(btn => {
-          btn.addEventListener("click", async () => {
-            const idx = parseInt(btn.dataset.index);
-            editPost(idx);
-          });
+          btn.addEventListener("click", () => editPost(parseInt(btn.dataset.index)));
         });
   
         document.querySelectorAll(".delete-btn").forEach(btn => {
-          btn.addEventListener("click", async () => {
-            const idx = parseInt(btn.dataset.index);
-            deletePost(idx);
-          });
+          btn.addEventListener("click", () => deletePost(parseInt(btn.dataset.index)));
         });
       }
   
       // -----------------------------
-      // Create / Update Article
-      // -----------------------------
+      // Submit / Create Article
       document.getElementById("formNewPost")?.addEventListener("submit", async e => {
         e.preventDefault();
         const title = document.getElementById("title").value.trim();
@@ -122,9 +105,14 @@
   
         try {
           await GH.saveFile(`posts/${slug}.html`, html);
-          await GH.updatePostsJSON({ title, slug, date: new Date().toISOString() });
+  
+          // Update posts.json
+          const posts = await GH.listPostsIndex();
+          posts.push({ title, slug, date: new Date().toISOString() });
+          await GH.saveFile("data/posts.json", JSON.stringify(posts, null, 2));
+  
           alert("Artikel berhasil dipublish!");
-          document.getElementById("formNewPost").reset();
+          e.target.reset();
           loadPosts();
         } catch (err) {
           console.error("Error publish:", err);
@@ -134,24 +122,22 @@
   
       // -----------------------------
       // Edit Article
-      // -----------------------------
       async function editPost(index) {
         const posts = await GH.listPostsIndex();
         const post = posts[index];
         if (!post) return alert("Artikel tidak ditemukan");
   
         document.getElementById("title").value = post.title;
-        // Ambil content asli dari GitHub
         try {
           const res = await fetch(`https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/main/posts/${post.slug}.html`);
           const text = await res.text();
-          // Ambil bagian body saja
           const contentMatch = text.match(/<div class="container">([\s\S]*?)<\/div>/);
           document.getElementById("content").value = contentMatch ? contentMatch[1] : "";
           document.querySelector(".nav-btn[data-target='newpost']").click();
   
-          // Delete lama dulu sebelum publish baru
-          deletePost(index, false);
+          // Optional: Hapus post lama supaya diganti commit baru
+          posts.splice(index, 1);
+          await GH.saveFile("data/posts.json", JSON.stringify(posts, null, 2));
         } catch (err) {
           console.error("Gagal load artikel:", err);
         }
@@ -159,34 +145,29 @@
   
       // -----------------------------
       // Delete Article
-      // -----------------------------
-      async function deletePost(index, reload = true) {
+      async function deletePost(index) {
         const posts = await GH.listPostsIndex();
         const post = posts[index];
         if (!post) return alert("Artikel tidak ditemukan");
-  
         if (!confirm(`Hapus artikel "${post.title}"?`)) return;
   
-        // Hapus file HTML dari GitHub
-        await GH.saveFile(`posts/${post.slug}.html`, ""); // overwrite dengan kosong atau bisa pakai API delete
-        // Update posts.json
-        posts.splice(index, 1);
-        await GH.saveFile("data/posts.json", JSON.stringify(posts, null, 2));
-        await GH.updateSitemap(posts);
+        try {
+          // Hapus file HTML dari GitHub (overwrite kosong)
+          await GH.saveFile(`posts/${post.slug}.html`, "");
+          posts.splice(index, 1);
+          await GH.saveFile("data/posts.json", JSON.stringify(posts, null, 2));
   
-        if (reload) loadPosts();
+          loadPosts();
+        } catch (err) {
+          console.error("Gagal hapus artikel:", err);
+        }
       }
   
       if (document.getElementById("postList")) loadPosts();
   
       // -----------------------------
-      // Helper: Escape HTML
-      // -----------------------------
       function escapeHtml(s) {
-        return String(s)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       }
   
     });
